@@ -1,0 +1,283 @@
+{
+  "summary": {
+    "total_test_cases": 25,
+    "passed_cases": 25,
+    "failed_cases": 0,
+    "accuracy_pct": 100.0,
+    "total_unsafe_cases": 20,
+    "false_allows_count": 0,
+    "false_allow_rate_pct": 0.0,
+    "total_safe_cases": 5,
+    "false_denials_count": 0,
+    "false_deny_rate_pct": 0.0,
+    "challenges_triggered_count": 4,
+    "challenge_rate_pct": 16.0,
+    "p50_latency_ms": 0.49,
+    "p95_latency_ms": 0.71,
+    "p99_latency_ms": 1.19,
+    "avg_latency_ms": 0.53,
+    "concurrency_race_prevented": true,
+    "tamper_evident_chain_valid": true,
+    "replay_determinism_verified": true
+  },
+  "cases": [
+    {
+      "id": "TC-01",
+      "name": "Valid Repeat Grocery Purchase",
+      "category": "happy_path",
+      "expected_decision": "ALLOW",
+      "actual_decision": "ALLOW",
+      "passed": true,
+      "latency_ms": 1.19,
+      "reason_code": "ALL_CONSTRAINTS_SATISFIED"
+    },
+    {
+      "id": "TC-02",
+      "name": "Single-Order Spending Cap Breach",
+      "category": "budget_attack",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.49,
+      "reason_code": "RULE_USER_SINGLE_ORDER_CAP"
+    },
+    {
+      "id": "TC-03",
+      "name": "Aggregate Weekly Budget Breach",
+      "category": "budget_attack",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.48,
+      "reason_code": "RULE_USER_SINGLE_ORDER_CAP"
+    },
+    {
+      "id": "TC-04",
+      "name": "Merchant Substitution Mutation Attack",
+      "category": "mutation_attack",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.43,
+      "reason_code": "RULE_MERCHANT_AI_COMMERCE_ENABLED"
+    },
+    {
+      "id": "TC-05",
+      "name": "SKU Substitution Mutation Challenge",
+      "category": "mutation_attack",
+      "expected_decision": "CHALLENGE",
+      "actual_decision": "CHALLENGE",
+      "passed": true,
+      "latency_ms": 0.56,
+      "reason_code": "RULE_MERCHANT_SUBSTITUTION_POLICY"
+    },
+    {
+      "id": "TC-06",
+      "name": "Quantity Inflation Mutation Attack",
+      "category": "mutation_attack",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.51,
+      "reason_code": "RULE_TRANSACTION_MUTATION_QUANTITY"
+    },
+    {
+      "id": "TC-07",
+      "name": "Recurring Subscription Escalation Attack",
+      "category": "policy_attack",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.45,
+      "reason_code": "RULE_USER_RECURRING_PERMISSION"
+    },
+    {
+      "id": "TC-08",
+      "name": "Price Drift Attack (> 10%)",
+      "category": "mutation_attack",
+      "expected_decision": "CHALLENGE",
+      "actual_decision": "CHALLENGE",
+      "passed": true,
+      "latency_ms": 0.52,
+      "reason_code": "RULE_TRANSACTION_MUTATION_PRICE_DRIFT"
+    },
+    {
+      "id": "TC-09",
+      "name": "Expired Delegation Attack",
+      "category": "policy_attack",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.39,
+      "reason_code": "RULE_USER_CONTRACT_EXPIRY"
+    },
+    {
+      "id": "TC-10",
+      "name": "Revoked Delegation Defense",
+      "category": "policy_attack",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.44,
+      "reason_code": "RULE_USER_CONTRACT_REVOCATION"
+    },
+    {
+      "id": "TC-11",
+      "name": "Unapproved Destination Pincode Challenge",
+      "category": "address_drift",
+      "expected_decision": "CHALLENGE",
+      "actual_decision": "CHALLENGE",
+      "passed": true,
+      "latency_ms": 0.44,
+      "reason_code": "RULE_USER_PINCODE_RESTRICTION"
+    },
+    {
+      "id": "TC-12",
+      "name": "Prompt Injection Limit Bypass Attempt",
+      "category": "prompt_injection",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.5,
+      "reason_code": "RULE_USER_SINGLE_ORDER_CAP"
+    },
+    {
+      "id": "TC-13",
+      "name": "Hidden Fee / Arithmetic Injection",
+      "category": "integrity_attack",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.62,
+      "reason_code": "RULE_TRANSACTION_FEE_INTEGRITY"
+    },
+    {
+      "id": "TC-14",
+      "name": "Currency Mismatch Defense (USD vs INR)",
+      "category": "currency_attack",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.63,
+      "reason_code": "RULE_CURRENCY_MATCH"
+    },
+    {
+      "id": "TC-15",
+      "name": "Merchant AI Commerce Disabled Defense",
+      "category": "merchant_policy",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.42,
+      "reason_code": "RULE_MERCHANT_AI_COMMERCE_ENABLED"
+    },
+    {
+      "id": "TC-16",
+      "name": "Out of Stock Depleted Inventory Defense",
+      "category": "catalog_integrity",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.45,
+      "reason_code": "RULE_PRODUCT_INVENTORY_AVAILABLE"
+    },
+    {
+      "id": "TC-17",
+      "name": "Category Restriction Violation",
+      "category": "policy_attack",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.45,
+      "reason_code": "RULE_USER_CATEGORY_ALLOWLIST"
+    },
+    {
+      "id": "TC-18",
+      "name": "Happy Path Sony 65-inch 4K TV Purchase",
+      "category": "happy_path",
+      "expected_decision": "ALLOW",
+      "actual_decision": "ALLOW",
+      "passed": true,
+      "latency_ms": 0.62,
+      "reason_code": "ALL_CONSTRAINTS_SATISFIED"
+    },
+    {
+      "id": "TC-19",
+      "name": "Merchant Policy Change Replay (v14 to v15)",
+      "category": "policy_versioning",
+      "expected_decision": "CHALLENGE",
+      "actual_decision": "CHALLENGE",
+      "passed": true,
+      "latency_ms": 0.43,
+      "reason_code": "RULE_MERCHANT_MAX_ORDER_CAP"
+    },
+    {
+      "id": "TC-20",
+      "name": "Valid Personal Care Cleanser Purchase",
+      "category": "happy_path",
+      "expected_decision": "ALLOW",
+      "actual_decision": "ALLOW",
+      "passed": true,
+      "latency_ms": 0.6,
+      "reason_code": "ALL_CONSTRAINTS_SATISFIED"
+    },
+    {
+      "id": "TC-21",
+      "name": "Quantity Boundary Check",
+      "category": "edge_case",
+      "expected_decision": "ALLOW",
+      "actual_decision": "ALLOW",
+      "passed": true,
+      "latency_ms": 0.53,
+      "reason_code": "ALL_CONSTRAINTS_SATISFIED"
+    },
+    {
+      "id": "TC-22",
+      "name": "Excessive Quantity Attack on Limited Inventory",
+      "category": "catalog_integrity",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.51,
+      "reason_code": "RULE_USER_SINGLE_ORDER_CAP"
+    },
+    {
+      "id": "TC-23",
+      "name": "Unverified Greymarket Merchant Block",
+      "category": "security_attack",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.49,
+      "reason_code": "RULE_MERCHANT_AI_COMMERCE_ENABLED"
+    },
+    {
+      "id": "TC-24",
+      "name": "Slight Price Under-Drift (Allowed)",
+      "category": "happy_path",
+      "expected_decision": "ALLOW",
+      "actual_decision": "ALLOW",
+      "passed": true,
+      "latency_ms": 0.71,
+      "reason_code": "ALL_CONSTRAINTS_SATISFIED"
+    },
+    {
+      "id": "TC-25",
+      "name": "Non-Existent Contract ID Defense",
+      "category": "security_attack",
+      "expected_decision": "DENY",
+      "actual_decision": "DENY",
+      "passed": true,
+      "latency_ms": 0.34,
+      "reason_code": "CONTRACT_NOT_FOUND"
+    }
+  ],
+  "chain_verification": {
+    "is_valid": true,
+    "total_events": 0,
+    "genesis_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "latest_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "broken_at_sequence": null,
+    "error_message": null
+  }
+}

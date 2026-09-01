@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Commerce Gateway — Razorpay AI Buildathon 2026</title>
+  <meta name="description" content="Production-grade transaction infrastructure layer turning Razorpay merchants into safe, machine-readable storefronts for autonomous AI buyers.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+  <!-- Top App Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-logo">
+          <div class="logo-badge">ACG</div>
+          <div>
+            <div class="brand-title">Agent Commerce Gateway</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted);">Razorpay AI Autonomous Commerce Infrastructure</div>
+          </div>
+        </div>
+        <div class="mode-badge">
+          <div class="pulse-dot"></div>
+          <span>Razorpay Test Mode Active</span>
+        </div>
+      </div>
+
+      <nav class="nav-tabs">
+        <button class="nav-btn active" data-tab="tab-buyer" id="nav-btn-buyer">
+          <span>🛍️</span> AI Buyer Studio
+        </button>
+        <button class="nav-btn" data-tab="tab-merchant" id="nav-btn-merchant">
+          <span>🏪</span> Merchant Control Plane
+        </button>
+        <button class="nav-btn" data-tab="tab-firewall" id="nav-btn-firewall">
+          <span>🛡️</span> Firewall & Decisions
+        </button>
+        <button class="nav-btn" data-tab="tab-replay" id="nav-btn-replay">
+          <span>🔬</span> Forensic Replay
+        </button>
+        <button class="nav-btn" data-tab="tab-benchmark" id="nav-btn-benchmark">
+          <span>⚡</span> Attack Benchmark
+        </button>
+        <button class="nav-btn" data-tab="tab-tour" id="nav-btn-tour" style="color: #38bdf8; font-weight: 600;">
+          <span>🎯</span> 5-Min Judge Tour
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-container">
+
+    <!-- 1. AI BUYER STUDIO -->
+    <section id="tab-buyer" class="tab-pane active">
+      <div class="grid-2col">
+        <!-- Left: Delegation & Shopping Intent -->
+        <div>
+          <!-- Natural Language Policy Compiler Card -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-header">
+              <div>
+                <div class="card-title"><span>✍️</span> Natural Language Delegation Compiler</div>
+                <div class="card-subtitle">Compiles user intent into machine-enforceable authorization contracts with ambiguity checks.</div>
+              </div>
+            </div>
+
+            <div class="chips-group">
+              <span class="chip" onclick="setDelegationPreset('grocery')">Grocery Delegation (₹5k/week)</span>
+              <span class="chip" onclick="setDelegationPreset('tv')">TV Delegation (₹75k Ceiling)</span>
+              <span class="chip" onclick="setDelegationPreset('ambiguous')">Ambiguous Intent (Triggers Clarification)</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="delegation-prompt">User Natural Language Delegation Prompt</label>
+              <textarea id="delegation-prompt" class="form-control" rows="3" placeholder="e.g. Spend up to ₹5,000 this week on groceries from FreshMart for 560001. Require approval if price jumps >10%."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem;">
+              <button class="btn btn-primary" id="btn-compile-delegation" onclick="compileDelegation()">
+                <span>⚡</span> Compile Delegation
+              </button>
+              <button class="btn btn-secondary" onclick="loadUserContracts()">
+                <span>🔄</span> Refresh Contracts
+              </button>
+            </div>
+
+            <!-- Ambiguity Warning Box -->
+            <div id="ambiguity-box" style="display: none; margin-top: 1rem; padding: 0.85rem; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-sm);">
+              <div style="color: #fbbf24; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">⚠️ Ambiguity Detected — User Confirmation Recommended:</div>
+              <ul id="ambiguity-list" style="margin-left: 1.25rem; font-size: 0.8rem; color: #fde68a;"></ul>
+            </div>
+          </div>
+
+          <!-- Autonomous AI Buyer Shopping Agent Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title"><span>🤖</span> Autonomous AI Buyer Shopping Agent</div>
+                <div class="card-subtitle">Executes discovery, negotiation, firewall evaluation, and payment under active contract.</div>
+              </div>
+            </div>
+
+            <div class="chips-group">
+              <span class="chip" onclick="setShoppingPreset('happy_oats')">Happy Path: Oats (₹782)</span>
+              <span class="chip" onclick="setShoppingPreset('sony_tv')">Sony 65" TV (₹68,999)</span>
+              <span class="chip" onclick="setShoppingPreset('budget_breach')">Budget Attack: Caviar (₹50k)</span>
+              <span class="chip" onclick="setShoppingPreset('mutation_attack')">Mutation Attack: Shady Store</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="select-user-contract">Active User Authorization Contract</label>
+              <select id="select-user-contract" class="form-control">
+                <option value="contract_grocery_5k_weekly">contract_grocery_5k_weekly (Rahul Sharma — Max ₹5,000/wk)</option>
+                <option value="contract_tv_electronics_75k">contract_tv_electronics_75k (User 238 — Max ₹75,000/order)</option>
+                <option value="contract_expired_demo">contract_expired_demo (Expired 3 days ago)</option>
+                <option value="contract_revoked_demo">contract_revoked_demo (Revoked by User)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="shopping-goal">Autonomous Shopping Goal</label>
+              <input type="text" id="shopping-goal" class="form-control" value="Buy 2 packs of organic rolled oats under ₹1,000 for Bangalore delivery">
+            </div>
+
+            <div class="grid-2col" style="gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label" for="shopping-budget">Target Budget (INR)</label>
+                <input type="number" id="shopping-budget" class="form-control" value="800">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="shopping-ceiling">Hard Ceiling (INR)</label>
+                <input type="number" id="shopping-ceiling" class="form-control" value="1000">
+              </div>
+            </div>
+
+            <div class="grid-2col" style="gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label" for="shopping-category">Product Category</label>
+                <select id="shopping-category" class="form-control">
+                  <option value="groceries">Groceries</option>
+                  <option value="electronics">Electronics</option>
+                  <option value="personal_care">Personal Care</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="shopping-pincode">Destination Pincode</label>
+                <input type="text" id="shopping-pincode" class="form-control" value="560001">
+              </div>
+            </div>
+
+            <button class="btn btn-emerald" style="width: 100%;" id="btn-execute-shop" onclick="executeAIShopping()">
+              <span>🚀</span> Dispatch Autonomous AI Buyer & Execute Payment
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Real-time Execution & Decision Trace -->
+        <div>
+          <div class="card" style="height: 100%;">
+            <div class="card-header">
+              <div>
+                <div class="card-title"><span>📡</span> Real-Time Autonomous Commerce Trace</div>
+                <div class="card-subtitle">Full cryptographic decision trace, firewall evaluation, and Razorpay test payment response.</div>
+              </div>
+              <span id="agent-status-badge" class="badge badge-allow" style="display: none;">IDLE</span>
+            </div>
+
+            <!-- Result Decision Visual Banner -->
+            <div id="decision-visual-banner" style="display: none;" class="decision-banner banner-allow">
+              <div>
+                <div id="banner-title" style="font-weight: 700; font-size: 1.05rem;">TRANSACTION AUTHORIZED</div>
+                <div id="banner-subtitle" style="font-size: 0.85rem; opacity: 0.9;">All deterministic constraints satisfied. Budget reserved.</div>
+              </div>
+              <div id="banner-tag" class="badge badge-allow">ALLOW</div>
+            </div>
+
+            <!-- Razorpay Payment Execution Card -->
+            <div id="razorpay-card" style="display: none; background: rgba(51, 149, 255, 0.08); border: 1px solid rgba(51, 149, 255, 0.25); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                <div style="font-weight: 700; color: #38bdf8; font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <span>💳</span> Razorpay Test-Mode Payment Success
+                </div>
+                <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">COMPLETED</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.8rem; font-family: var(--font-mono); color: #cbd5e1;">
+                <div>Order ID: <span id="rzp-order-id" style="color: #93c5fd;">-</span></div>
+                <div>Payment ID: <span id="rzp-payment-id" style="color: #93c5fd;">-</span></div>
+                <div>Amount Paid: <span id="rzp-amount" style="color: #34d399; font-weight: 600;">-</span></div>
+                <div>Auth Mode: <span style="color: #cbd5e1;">DETERMINISTIC</span></div>
+              </div>
+              <div style="margin-top: 0.5rem; font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-muted); word-break: break-all;">
+                HMAC Signature: <span id="rzp-signature" style="color: #64748b;">-</span>
+              </div>
+            </div>
+
+            <!-- Live JSON Trace -->
+            <div class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Structured Execution Telemetry & Decision Payload</span>
+              <button class="btn btn-secondary btn-sm" onclick="copyTraceJSON()">Copy JSON</button>
+            </div>
+            <pre id="agent-trace-box" class="code-block" style="min-height: 280px;">// Trigger a shopping flow on the left to view full cryptographic trace...</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. MERCHANT CONTROL PLANE -->
+    <section id="tab-merchant" class="tab-pane">
+      <div class="grid-main-sidebar">
+        <!-- Merchant Policies Sidebar -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><span>🏢</span> Active Merchant</div>
+              <div class="card-subtitle">Select merchant to view catalog & policies.</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="merchant-select">Select Merchant Store</label>
+            <select id="merchant-select" class="form-control" onchange="loadMerchantData()">
+              <option value="merchant_freshmart">FreshMart Supermarket (Verified)</option>
+              <option value="merchant_croma_store">Croma Electronics (Verified)</option>
+              <option value="merchant_untrusted">Shady GrayMarket Store (Untrusted)</option>
+            </select>
+          </div>
+
+          <div class="card" style="background: rgba(15, 23, 42, 0.6); padding: 1rem; margin-bottom: 1rem;">
+            <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem;">Policy Versioning</div>
+            <div class="form-group">
+              <label class="form-label" for="merchant-policy-ver">Active AI Policy Version</label>
+              <select id="merchant-policy-ver" class="form-control" onchange="switchPolicyVersion()">
+                <option value="v1">v1 (Default Baseline Policy)</option>
+                <option value="v14">v14 (Croma 65" TV Autonomous Cap ₹75,000)</option>
+                <option value="v15">v15 (Croma Tightened Autonomous Cap ₹50,000)</option>
+              </select>
+            </div>
+            <div id="merchant-policy-summary" style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+              Autonomous Max Order: ₹5,000.00<br>
+              AI Commerce: ENABLED<br>
+              Max Discount: 15%
+            </div>
+          </div>
+
+          <button class="btn btn-primary" style="width: 100%;" onclick="openPolicyEditorModal()">
+            <span>✏️</span> Edit Merchant AI Policy
+          </button>
+        </div>
+
+        <!-- Machine Readable Catalog Table -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><span>📦</span> Machine-Readable Storefront Catalog</div>
+              <div class="card-subtitle">Zero-scrape schema available to autonomous agent buyers with real-time inventory.</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="loadMerchantCatalog()">
+              <span>🔄</span> Refresh Catalog
+            </button>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;" id="catalog-table">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); text-align: left;">
+                  <th style="padding: 0.75rem 0.5rem;">SKU</th>
+                  <th style="padding: 0.75rem 0.5rem;">Product Title</th>
+                  <th style="padding: 0.75rem 0.5rem;">Category</th>
+                  <th style="padding: 0.75rem 0.5rem;">Price (INR)</th>
+                  <th style="padding: 0.75rem 0.5rem;">Stock</th>
+                  <th style="padding: 0.75rem 0.5rem;">AI Eligible</th>
+                  <th style="padding: 0.75rem 0.5rem;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="catalog-tbody">
+                <!-- Populated dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. DETERMINISTIC FIREWALL & DECISION INSPECTOR -->
+    <section id="tab-firewall" class="tab-pane">
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="metric-lbl">Firewall Architecture</div>
+          <div class="metric-val" style="color: #38bdf8; font-size: 1.25rem;">Deterministic Pure Code</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-lbl">False Allow Rate</div>
+          <div class="metric-val" style="color: #34d399;">0.00%</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-lbl">Evaluation Latency</div>
+          <div class="metric-val" style="color: #a78bfa;">&lt; 1.0 ms (p95)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-lbl">Concurrency Race Defense</div>
+          <div class="metric-val" style="color: #38bdf8; font-size: 1.25rem;">Atomic Row-Lock</div>
+        </div>
+      </div>
+
+      <div class="grid-2col">
+        <!-- Live Transaction Firewall Evaluator -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><span>🛡️</span> Live Deterministic Firewall Inspector</div>
+              <div class="card-subtitle">Test any custom transaction against deterministic rules in real-time.</div>
+            </div>
+          </div>
+
+          <div class="grid-2col" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="fw-merchant">Merchant ID</label>
+              <input type="text" id="fw-merchant" class="form-control" value="merchant_freshmart">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="fw-sku">Product SKU</label>
+              <input type="text" id="fw-sku" class="form-control" value="GROC-ORGANIC-OATS-1KG">
+            </div>
+          </div>
+
+          <div class="grid-3col" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="fw-qty">Quantity</label>
+              <input type="number" id="fw-qty" class="form-control" value="2">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="fw-price">Unit Price (₹)</label>
+              <input type="number" id="fw-price" class="form-control" value="349">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="fw-total">Total INR (₹)</label>
+              <input type="number" id="fw-total" class="form-control" value="782.9">
+            </div>
+          </div>
+
+          <div class="grid-2col" style="gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="fw-contract">Contract ID</label>
+              <input type="text" id="fw-contract" class="form-control" value="contract_grocery_5k_weekly">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="fw-pincode">Pincode</label>
+              <input type="text" id="fw-pincode" class="form-control" value="560001">
+            </div>
+          </div>
+
+          <button class="btn btn-primary" style="width: 100%;" onclick="evaluateCustomFirewallTx()">
+            <span>⚡</span> Evaluate Deterministic Firewall Predicates
+          </button>
+
+          <!-- Budget Progress Card -->
+          <div style="margin-top: 1.25rem; background: rgba(15, 23, 42, 0.6); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600;">
+              <span>Weekly Budget Window Status</span>
+              <span id="fw-budget-text" style="color: #38bdf8;">Available: ₹5,000 / ₹5,000</span>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar-bg">
+                <div id="fw-budget-bar" class="progress-bar-fill" style="width: 0%; background: linear-gradient(90deg, #38bdf8, #3b82f6);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rule Evaluation Matrix Output -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><span>📋</span> Predicate Evaluation Matrix</div>
+              <div class="card-subtitle">Exact rule outcomes evaluated by the deterministic engine.</div>
+            </div>
+            <span id="fw-decision-badge" class="badge badge-allow" style="display: none;">ALLOW</span>
+          </div>
+
+          <div id="rule-matrix-container">
+            <div class="rule-item passed">
+              <span>RULE_USER_CONTRACT_EXISTS</span>
+              <span class="badge badge-allow">PASSED</span>
+            </div>
+            <div class="rule-item passed">
+              <span>RULE_USER_CONTRACT_EXPIRY</span>
+              <span class="badge badge-allow">PASSED</span>
+            </div>
+            <div class="rule-item passed">
+              <span>RULE_USER_MERCHANT_ALLOWLIST</span>
+              <span class="badge badge-allow">PASSED</span>
+            </div>
+            <div class="rule-item passed">
+              <span>RULE_USER_SINGLE_ORDER_CAP</span>
+              <span class="badge badge-allow">PASSED</span>
+            </div>
+            <div class="rule-item passed">
+              <span>RULE_USER_AGGREGATE_BUDGET</span>
+              <span class="badge badge-allow">PASSED</span>
+            </div>
+            <div class="rule-item passed">
+              <span>RULE_MERCHANT_AI_COMMERCE_ENABLED</span>
+              <span class="badge badge-allow">PASSED</span>
+            </div>
+            <div class="rule-item passed">
+              <span>RULE_PRODUCT_INVENTORY_AVAILABLE</span>
+              <span class="badge badge-allow">PASSED</span>
+            </div>
+            <div class="rule-item passed">
+              <span>RULE_TRANSACTION_FEE_INTEGRITY</span>
+              <span class="badge badge-allow">PASSED</span>
+            </div>
+          </div>
+
+          <!-- Step-up Challenge Card (if triggered) -->
+          <div id="step-up-card" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-md);">
+            <div style="font-weight: 700; color: #fbbf24; font-size: 0.95rem; margin-bottom: 0.25rem;">⚠️ Step-Up User Approval Challenge Required</div>
+            <div id="step-up-reasons" style="font-size: 0.8rem; color: #fde68a; margin-bottom: 0.75rem;">-</div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-emerald btn-sm" onclick="resolveStepUpChallenge(true)"><span>✓</span> Approve Step-Up (Simulate User OTP/Biometric)</button>
+              <button class="btn btn-danger btn-sm" onclick="resolveStepUpChallenge(false)"><span>✕</span> Deny Step-Up</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. FORENSIC POLICY REPLAY SIMULATOR -->
+    <section id="tab-replay" class="tab-pane">
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><span>🔬</span> Forensic Transaction Replay Simulator</div>
+            <div class="card-subtitle">Demonstrates deterministic reproducibility and explains policy discrepancies across versions (v14 vs v15).</div>
+          </div>
+        </div>
+
+        <div class="grid-3col" style="gap: 1rem; align-items: flex-end;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="replay-tx-preset">Select Historical Transaction Scenario</label>
+            <select id="replay-tx-preset" class="form-control" onchange="populateReplayPreset()">
+              <option value="croma_tv">Croma Sony 65" TV (₹68,999 under v14)</option>
+              <option value="grocery_happy">FreshMart Grocery (₹782 under v1)</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="replay-target-policy">Replay Against Target Policy Version</label>
+            <select id="replay-target-policy" class="form-control">
+              <option value="v15">v15 (Autonomous cap lowered to ₹50,000 -> Triggers Challenge)</option>
+              <option value="v14">v14 (Historical policy -> Deterministic Reproducibility)</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" onclick="executeForensicReplay()">
+            <span>⚡</span> Execute Forensic Replay
+          </button>
+        </div>
+      </div>
+
+      <!-- Side by Side Replay Diff Result -->
+      <div class="replay-split" id="replay-results-container">
+        <!-- Left: Historical Decision (v14) -->
+        <div class="replay-col">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <div style="font-weight: 700; font-size: 1rem; color: #38bdf8;">Historical Execution (v14)</div>
+            <span id="replay-hist-badge" class="badge badge-allow">ALLOW</span>
+          </div>
+          <div id="replay-hist-summary" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+            Merchant: merchant_croma_store | Policy: v14<br>
+            Max Autonomous Cap: ₹75,000.00 | Order Total: ₹68,999.00
+          </div>
+          <div class="rule-item passed">
+            <span>RULE_MERCHANT_MAX_ORDER_CAP (₹68,999 &le; ₹75,000)</span>
+            <span class="badge badge-allow">PASSED</span>
+          </div>
+          <div class="rule-item passed">
+            <span>RULE_USER_SINGLE_ORDER_CAP (₹68,999 &le; ₹75,000)</span>
+            <span class="badge badge-allow">PASSED</span>
+          </div>
+        </div>
+
+        <!-- Right: Replayed Decision (v15) -->
+        <div class="replay-col" style="border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.03);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <div style="font-weight: 700; font-size: 1rem; color: #fbbf24;">Replayed Execution (v15)</div>
+            <span id="replay-target-badge" class="badge badge-challenge">CHALLENGE</span>
+          </div>
+          <div id="replay-target-summary" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+            Merchant: merchant_croma_store | Policy: v15<br>
+            Max Autonomous Cap: ₹50,000.00 | Order Total: ₹68,999.00
+          </div>
+          <div class="rule-item challenged">
+            <span>RULE_MERCHANT_MAX_ORDER_CAP (₹68,999 &gt; ₹50,000 Cap)</span>
+            <span class="badge badge-challenge">CHALLENGE</span>
+          </div>
+          <div class="rule-item passed">
+            <span>RULE_USER_SINGLE_ORDER_CAP (₹68,999 &le; ₹75,000)</span>
+            <span class="badge badge-allow">PASSED</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. ADVERSARIAL BENCHMARK & ATTACK DEFENSE CONSOLE -->
+    <section id="tab-benchmark" class="tab-pane">
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><span>⚡</span> Adversarial Security Benchmark Suite</div>
+            <div class="card-subtitle">Automated evaluation against 25+ adversarial attack scenarios (Budget attacks, prompt injections, mutation attacks, address drift).</div>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-emerald" onclick="runBenchmarkInUI()">
+              <span>▶️</span> Run Full Benchmark Suite
+            </button>
+            <button class="btn btn-danger" onclick="runRaceStressTestInUI()">
+              <span>💥</span> Trigger 10-Thread Concurrency Race Attack
+            </button>
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-lbl">Benchmark Pass Rate</div>
+            <div class="metric-val" id="bm-pass-rate" style="color: #34d399;">100.0%</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-lbl">False Allow Rate</div>
+            <div class="metric-val" id="bm-far" style="color: #34d399;">0.00%</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-lbl">p95 Latency</div>
+            <div class="metric-val" id="bm-latency" style="color: #a78bfa;">0.71 ms</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-lbl">Audit Hash Chain</div>
+            <div class="metric-val" id="bm-chain" style="color: #38bdf8; font-size: 1.15rem;">TAMPER-EVIDENT</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Test Cases List -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span>🧪</span> Benchmark Test Cases & Attack Results</div>
+          <div style="display: flex; gap: 0.5rem;">
+            <select id="bm-category-filter" class="form-control" style="width: 180px;" onchange="filterBenchmarkTable()">
+              <option value="all">All Categories (25)</option>
+              <option value="happy_path">Happy Path</option>
+              <option value="budget_attack">Budget Attacks</option>
+              <option value="mutation_attack">Mutation Attacks</option>
+              <option value="policy_attack">Policy Attacks</option>
+              <option value="integrity_attack">Integrity Attacks</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;" id="benchmark-table">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary); text-align: left;">
+                <th style="padding: 0.75rem 0.5rem;">ID</th>
+                <th style="padding: 0.75rem 0.5rem;">Scenario Name</th>
+                <th style="padding: 0.75rem 0.5rem;">Attack Category</th>
+                <th style="padding: 0.75rem 0.5rem;">Expected</th>
+                <th style="padding: 0.75rem 0.5rem;">Actual Decision</th>
+                <th style="padding: 0.75rem 0.5rem;">Latency</th>
+                <th style="padding: 0.75rem 0.5rem;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="benchmark-tbody">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. 5-MINUTE JUDGE DEMO TOUR -->
+    <section id="tab-tour" class="tab-pane">
+      <div class="card" style="margin-bottom: 1.5rem; border-color: rgba(56, 189, 248, 0.4);">
+        <div class="card-header">
+          <div>
+            <div class="card-title" style="color: #38bdf8;"><span>🎯</span> 5-Minute Buildathon Judge Guided Tour</div>
+            <div class="card-subtitle">Walk step-by-step through the 7 core architectural capabilities that prove production viability.</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-bottom: 1.25rem;">
+          <button class="btn btn-secondary btn-sm active" onclick="loadTourStep(1)" id="tour-btn-1">1. Delegation</button>
+          <button class="btn btn-secondary btn-sm" onclick="loadTourStep(2)" id="tour-btn-2">2. Catalog/Neg</button>
+          <button class="btn btn-secondary btn-sm" onclick="loadTourStep(3)" id="tour-btn-3">3. Happy Path</button>
+          <button class="btn btn-secondary btn-sm" onclick="loadTourStep(4)" id="tour-btn-4">4. Mutation Block</button>
+          <button class="btn btn-secondary btn-sm" onclick="loadTourStep(5)" id="tour-btn-5">5. Budget Race</button>
+          <button class="btn btn-secondary btn-sm" onclick="loadTourStep(6)" id="tour-btn-6">6. Replay Diff</button>
+          <button class="btn btn-secondary btn-sm" onclick="loadTourStep(7)" id="tour-btn-7">7. Hash Audit</button>
+        </div>
+
+        <div id="tour-step-content" style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem;">
+          <div id="tour-step-title" style="font-size: 1.15rem; font-weight: 700; color: #38bdf8; margin-bottom: 0.4rem;">Step 1: User Natural Language Delegation with Ambiguity Defense</div>
+          <div id="tour-step-desc" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.5;">
+            The user specifies a shopping constraint in natural language. The AI Policy Compiler parses parameters and flags any ambiguities (e.g. unspecified merchant, loose budget) before committing the cryptographic contract.
+          </div>
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="btn btn-primary" id="tour-step-action-btn" onclick="executeTourStepAction()"><span>🚀</span> Execute Step Action</button>
+            <button class="btn btn-secondary" onclick="nextTourStep()"><span>➡️</span> Next Step</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Step-Up Approval Modal -->
+  <div class="modal-overlay" id="step-up-modal">
+    <div class="modal-card">
+      <div style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: #fbbf24;">
+        ⚠️ Step-Up Approval Required
+      </div>
+      <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+        The deterministic authorization firewall flagged a material condition that requires explicit user confirmation.
+      </div>
+      <div id="modal-step-up-details" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.85rem; font-size: 0.85rem; margin-bottom: 1.25rem;">
+        -
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button class="btn btn-secondary" onclick="closeStepUpModal()">Cancel</button>
+        <button class="btn btn-emerald" onclick="submitModalStepUpApproval(true)">Authorize Purchase</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

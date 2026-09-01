@@ -1,177 +1,80 @@
-from typing import Optional, List
-from sqlalchemy import select, and_, func, update
-from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import datetime, timedelta
-import uuid
+"""Budget calculation and aggregation engine."""
 
-from app.models import (
-    BudgetReservation, BudgetReservationStatus,
-    UserAuthorization, UserAuthorizationStatus,
-    Transaction, TransactionStatus
-)
-from app.config import get_settings
+from datetime import datetime, timezone, timedelta
+from typing import Tuple
+from app.core.db import get_db
+from app.authorization.models import BudgetState
+from app.authorization.contracts import UserAuthorizationContract
+from app.core.logging import logger
 
 
-class BudgetService:
-    def __init__(self, session: AsyncSession):
-        self.session = session
-        self.settings = get_settings()
+class BudgetEngine:
+    @staticmethod
+    def get_budget_window_start(contract: UserAuthorizationContract) -> str:
+        """Calculates the start timestamp of the current budget period window."""
+        now = datetime.now(timezone.utc)
+        period = contract.budget_period.lower()
 
-    async def reserve_budget(
-        self,
-        authorization_id: str,
-        amount_inr: int,
-        transaction_id: str = None
-    ) -> BudgetReservation:
-        auth = await self.session.get(UserAuthorization, authorization_id)
-        if not auth:
-            raise ValueError("Authorization not found")
+        if period == "daily":
+            start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        elif period == "weekly":
+            # Start of current week (Monday)
+            start = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+        elif period == "monthly":
+            start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        elif period == "per_order":
+            # Per order means aggregate is checked per individual order lifecycle
+            return "1970-01-01T00:00:00+00:00"
+        else:  # lifetime or default
+            return contract.issued_at
 
-        if auth.status != UserAuthorizationStatus.ACTIVE:
-            raise ValueError(f"Authorization is {auth.status.value}")
+        return start.isoformat()
 
-        if auth.expires_at < datetime.utcnow():
-            auth.status = UserAuthorizationStatus.EXPIRED
-            await self.session.flush()
-            raise ValueError("Authorization has expired")
+    @staticmethod
+    def compute_budget_state(contract: UserAuthorizationContract, requested_amount: float = 0.0) -> BudgetState:
+        """Computes current committed spent and active pending reservations under the contract."""
+        window_start = BudgetEngine.get_budget_window_start(contract)
+        now_iso = datetime.now(timezone.utc).isoformat()
 
-        if amount_inr > auth.max_order_value_inr:
-            raise ValueError(f"Amount {amount_inr} exceeds max order value {auth.max_order_value_inr}")
+        is_per_order = (contract.budget_period.lower() == "per_order")
 
-        period_start = datetime.utcnow() - timedelta(days=auth.budget_period_days)
+        with get_db() as conn:
+            # 1. Committed spending in active window (0 for per_order)
+            committed_spent = 0.0
+            if not is_per_order:
+                committed_row = conn.execute(
+                    """
+                    SELECT COALESCE(SUM(amount_inr), 0.0) as total_committed
+                    FROM budget_reservations
+                    WHERE contract_id = ? 
+                      AND status = 'COMMITTED'
+                      AND committed_at >= ?
+                    """,
+                    (contract.contract_id, window_start)
+                ).fetchone()
+                committed_spent = float(committed_row["total_committed"]) if committed_row else 0.0
 
-        result = await self.session.execute(
-            select(func.coalesce(func.sum(BudgetReservation.amount_inr), 0))
-            .where(
-                and_(
-                    BudgetReservation.authorization_id == authorization_id,
-                    BudgetReservation.status.in_([
-                        BudgetReservationStatus.RESERVED,
-                        BudgetReservationStatus.COMMITTED
-                    ]),
-                    BudgetReservation.created_at >= period_start,
-                )
-            )
+            # 2. Active, unexpired pending reservations
+            reserved_row = conn.execute(
+                """
+                SELECT COALESCE(SUM(amount_inr), 0.0) as total_reserved
+                FROM budget_reservations
+                WHERE contract_id = ? 
+                  AND status = 'PENDING'
+                  AND expires_at > ?
+                """,
+                (contract.contract_id, now_iso)
+            ).fetchone()
+            active_reserved = float(reserved_row["total_reserved"]) if reserved_row else 0.0
+
+        total_budget = contract.max_aggregate_value_inr
+        available_budget = max(0.0, total_budget - (committed_spent + active_reserved))
+
+        return BudgetState(
+            total_budget_inr=total_budget,
+            committed_spent_inr=committed_spent,
+            active_reserved_inr=active_reserved,
+            available_budget_inr=round(available_budget, 2),
+            requested_amount_inr=requested_amount,
+            budget_period=contract.budget_period
         )
-        current_spent = result.scalar() or 0
-
-        if current_spent + amount_inr > auth.max_aggregate_value_inr:
-            raise ValueError(
-                f"Aggregate budget exceeded: {current_spent} + {amount_inr} > {auth.max_aggregate_value_inr}"
-            )
-
-        expires_at = datetime.utcnow() + timedelta(seconds=self.settings.reservation_ttl_seconds)
-
-        reservation = BudgetReservation(
-            user_id=auth.user_id,
-            authorization_id=authorization_id,
-            transaction_id=transaction_id,
-            amount_inr=amount_inr,
-            status=BudgetReservationStatus.RESERVED,
-            reserved_at=datetime.utcnow(),
-            expires_at=expires_at,
-        )
-        self.session.add(reservation)
-        await self.session.flush()
-        await self.session.refresh(reservation)
-        return reservation
-
-    async def commit_reservation(self, reservation_id: str) -> Optional[BudgetReservation]:
-        result = await self.session.execute(
-            select(BudgetReservation).where(BudgetReservation.id == reservation_id)
-        )
-        reservation = result.scalar_one_or_none()
-
-        if not reservation:
-            return None
-
-        if reservation.status != BudgetReservationStatus.RESERVED:
-            raise ValueError(f"Reservation is {reservation.status.value}, cannot commit")
-
-        reservation.status = BudgetReservationStatus.COMMITTED
-        reservation.committed_at = datetime.utcnow()
-        await self.session.flush()
-        await self.session.refresh(reservation)
-        return reservation
-
-    async def release_reservation(self, reservation_id: str) -> Optional[BudgetReservation]:
-        result = await self.session.execute(
-            select(BudgetReservation).where(BudgetReservation.id == reservation_id)
-        )
-        reservation = result.scalar_one_or_none()
-
-        if not reservation:
-            return None
-
-        if reservation.status in [BudgetReservationStatus.COMMITTED, BudgetReservationStatus.RELEASED]:
-            return reservation
-
-        reservation.status = BudgetReservationStatus.RELEASED
-        reservation.released_at = datetime.utcnow()
-        await self.session.flush()
-        await self.session.refresh(reservation)
-        return reservation
-
-    async def get_reservation(self, reservation_id: str) -> Optional[BudgetReservation]:
-        result = await self.session.execute(
-            select(BudgetReservation).where(BudgetReservation.id == reservation_id)
-        )
-        return result.scalar_one_or_none()
-
-    async def get_reservation_by_transaction(self, transaction_id: str) -> Optional[BudgetReservation]:
-        result = await self.session.execute(
-            select(BudgetReservation).where(BudgetReservation.transaction_id == transaction_id)
-        )
-        return result.scalar_one_or_none()
-
-    async def expire_reservations(self) -> int:
-        result = await self.session.execute(
-            update(BudgetReservation)
-            .where(
-                and_(
-                    BudgetReservation.status == BudgetReservationStatus.RESERVED,
-                    BudgetReservation.expires_at < datetime.utcnow(),
-                )
-            )
-            .values(status=BudgetReservationStatus.EXPIRED, released_at=datetime.utcnow())
-        )
-        return result.rowcount
-
-    async def get_active_reservations(self, authorization_id: str) -> List[BudgetReservation]:
-        result = await self.session.execute(
-            select(BudgetReservation)
-            .where(
-                and_(
-                    BudgetReservation.authorization_id == authorization_id,
-                    BudgetReservation.status.in_([
-                        BudgetReservationStatus.RESERVED,
-                        BudgetReservationStatus.COMMITTED
-                    ])
-                )
-            )
-        )
-        return result.scalars().all()
-
-    async def get_available_budget(self, authorization_id: str) -> int:
-        auth = await self.session.get(UserAuthorization, authorization_id)
-        if not auth:
-            return 0
-
-        period_start = datetime.utcnow() - timedelta(days=auth.budget_period_days)
-
-        result = await self.session.execute(
-            select(func.coalesce(func.sum(BudgetReservation.amount_inr), 0))
-            .where(
-                and_(
-                    BudgetReservation.authorization_id == authorization_id,
-                    BudgetReservation.status.in_([
-                        BudgetReservationStatus.RESERVED,
-                        BudgetReservationStatus.COMMITTED
-                    ]),
-                    BudgetReservation.created_at >= period_start,
-                )
-            )
-        )
-        current_spent = result.scalar() or 0
-
-        return max(0, auth.max_aggregate_value_inr - current_spent)
